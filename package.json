@@ -12,7 +12,7 @@
     "e2ee"
   ],
   "exports": {
-    ".": "./src/extension.ts",
+    ".": "./index.ts",
     "./daemon": "./src/daemon.ts",
     "./broker": "./src/broker.ts",
     "./transport": "./src/transport.ts"
@@ -23,6 +23,7 @@
     ]
   },
   "files": [
+    "index.ts",
     "src",
     "scripts",
     "migrations",
