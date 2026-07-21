@@ -59,7 +59,7 @@ printf '%s' "$MATRIX_PASSWORD" | npm run enroll:matrix -- \
 unset MATRIX_PASSWORD
 ```
 
-Or import an existing access token from a mode-0600 file:
+Or import a token for a freshly provisioned device that has never uploaded E2EE keys from a mode-0600 file. Tokens exported from an existing Element device are deliberately refused because its private crypto store is unavailable:
 
 ```bash
 npm run enroll:matrix -- \
