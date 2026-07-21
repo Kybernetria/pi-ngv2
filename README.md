@@ -47,6 +47,18 @@ Edit the approved users, rooms, and agent profiles. Agent profile values come on
 
 ## Matrix enrollment
 
+For a homeserver that uses GitHub or another SSO provider:
+
+```bash
+npm run enroll:matrix -- \
+  --homeserver https://matrix.example.org \
+  --user-id @pi-agent:example.org \
+  --sso \
+  --test-room '!roomid:example.org'
+```
+
+Open the printed URL in a browser on the same machine and complete the SSO flow. The callback listens only on `127.0.0.1` and the returned login token is never displayed.
+
 Password login without terminal echo:
 
 ```bash
