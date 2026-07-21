@@ -1,0 +1,25 @@
+{
+  "protocolVersion": "0.2.0",
+  "nodeId": "pi_ng",
+  "packageId": "@kybernetria/pi-ngv2",
+  "version": "1.0.0",
+  "purpose": "Transport-neutral notifications through the fail-closed pi-ng v2 daemon.",
+  "provides": [
+    {
+      "name": "notify",
+      "description": "Queue an administrator-configured notification. The caller cannot select a recipient.",
+      "inputSchema": { "type": "object", "additionalProperties": false, "required": ["message"], "properties": { "message": { "type": "string", "minLength": 1, "maxLength": 100000 }, "urgency": { "type": "string", "enum": ["low", "normal", "high"] } } },
+      "outputSchema": { "type": "object", "required": ["accepted", "deliveryId"], "properties": { "accepted": { "type": "boolean" }, "deliveryId": { "type": "string" } } },
+      "execution": { "type": "handler", "handler": "notify" },
+      "effects": ["network", "send_message"]
+    },
+    {
+      "name": "send",
+      "description": "Compatibility: send a Signal Note-to-Self through the administrator-configured account.",
+      "inputSchema": { "type": "object", "additionalProperties": false, "required": ["message"], "properties": { "message": { "type": "string", "minLength": 1, "maxLength": 8000 } } },
+      "outputSchema": { "type": "object", "required": ["accepted", "deliveryId"], "properties": { "accepted": { "type": "boolean" }, "deliveryId": { "type": "string" } } },
+      "execution": { "type": "handler", "handler": "send" },
+      "effects": ["network", "send_message"]
+    }
+  ]
+}

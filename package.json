@@ -1,0 +1,66 @@
+{
+  "name": "@kybernetria/pi-ngv2",
+  "version": "1.0.0",
+  "description": "Fail-closed Matrix gateway and durable session broker for Pi",
+  "type": "module",
+  "private": false,
+  "license": "AGPL-3.0-or-later",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "matrix",
+    "e2ee"
+  ],
+  "exports": {
+    ".": "./src/extension.ts",
+    "./daemon": "./src/daemon.ts",
+    "./broker": "./src/broker.ts",
+    "./transport": "./src/transport.ts"
+  },
+  "pi": {
+    "extensions": [
+      "./src/extension.ts"
+    ]
+  },
+  "files": [
+    "src",
+    "scripts",
+    "migrations",
+    "systemd",
+    "docs",
+    "pi.protocol.json",
+    "config.example.json",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "check": "npm run typecheck && npm test",
+    "daemon": "tsx scripts/daemon.ts",
+    "doctor": "tsx scripts/doctor.ts",
+    "enroll:matrix": "tsx scripts/enroll-matrix.ts",
+    "install:service": "tsx scripts/install-user-service.ts",
+    "verify:crypto": "tsx src/native-integrity.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.80.7 <0.81.0",
+    "@kybernetria/pi-protocol": "^1.0.8",
+    "@mariozechner/pi-ai": "^0.73.1",
+    "@matrix-org/matrix-sdk-crypto-nodejs": "0.6.1",
+    "typebox": "^1.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.80.7 <0.81.0"
+  }
+}

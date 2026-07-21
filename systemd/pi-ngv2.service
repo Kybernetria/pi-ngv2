@@ -1,0 +1,22 @@
+[Unit]
+Description=pi-ng v2 Matrix gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+UMask=0077
+ExecStart=@NODE@ --import @TSX@ @ROOT@/scripts/daemon.ts
+WorkingDirectory=@ROOT@
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/pi-ng %h/.local/share/pi-ngv2 %h/.local/state/pi-ngv2 %t/pi-ngv2
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "primaryTransport": "matrix",
+  "matrix": {
+    "enabled": true,
+    "shadowMode": true,
+    "homeserver": "https://matrix.example.org",
+    "userId": "@pi-agent:example.org",
+    "accessTokenFile": "/home/user/.local/share/pi-ngv2/matrix/access-token",
+    "allowedUsers": ["@admin:example.org"],
+    "allowedRooms": ["!roomid:example.org"],
+    "administrators": ["@admin:example.org"],
+    "roomAgents": { "!roomid:example.org": "backend" },
+    "controlRooms": [],
+    "requireEncryption": true,
+    "requireVerifiedDevices": true,
+    "strictRoomMembership": true,
+    "invitePolicy": "preconfigured"
+  },
+  "signal": { "enabled": false, "mode": "disabled", "fallbackPolicy": "generic-status-only" },
+  "agents": [
+    { "id": "backend", "name": "Backend developer", "cwd": "/home/user/projects/api", "mode": "managed", "maxConcurrency": 1, "sessionTtlMinutes": 120 }
+  ]
+}

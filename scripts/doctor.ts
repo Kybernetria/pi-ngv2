@@ -1,0 +1,17 @@
+import { existsSync, lstatSync, readFileSync } from "node:fs";
+import { loadConfig } from "../src/config.ts";
+import { resolvePaths } from "../src/paths.ts";
+import { readSecretFile } from "../src/secrets.ts";
+import { SqliteStateStore } from "../src/sqlite-state-store.ts";
+import { verifyNativeCryptoIntegrity } from "../src/native-integrity.ts";
+const checks:Array<{name:string;ok:boolean;detail:string}>=[];const check=async(name:string,fn:()=>unknown|Promise<unknown>)=>{try{const value=await fn();checks.push({name,ok:true,detail:typeof value==="string"?value:"ok"});}catch(error){checks.push({name,ok:false,detail:error instanceof Error?error.message:String(error)});}};const paths=resolvePaths();let config:any;
+await check("configuration",()=>{config=loadConfig(paths.configFile);return`version ${config.version}`;});
+await check("config permissions",()=>permissions(paths.configFile,0o077));
+if(config){await check("database migrations",()=>{const store=new SqliteStateStore(paths.databaseFile);store.migrate();const detail=`${store.listConversations().length} conversations, ${store.listDeliveries("dead_letter").length} dead letters`;store.close();return detail;});
+ await check("broker socket",()=>!existsSync(paths.brokerSocket)?"not running":permissions(paths.brokerSocket,0o177));
+ if(config.matrix.enabled){await check("Matrix token",()=>readSecretFile(config.matrix.accessTokenFile,"Matrix token")&&"secure");await check("Matrix crypto store",()=>{if(!existsSync(`${paths.matrixDir}/enrollment.json`))throw new Error("not enrolled");return permissions(paths.matrixDir,0o077);});
+  if(process.argv.includes("--online")){verifyNativeCryptoIntegrity();const{MatrixBotClientAdapter}=await import("../src/matrix/matrix-client.ts");let client:InstanceType<typeof MatrixBotClientAdapter>|undefined;await check("Matrix account/device/E2EE",async()=>{client=new MatrixBotClientAdapter({homeserver:config.matrix.homeserver,userId:config.matrix.userId,accessTokenFile:config.matrix.accessTokenFile,storageDir:paths.matrixDir,requireVerifiedDevices:config.matrix.requireVerifiedDevices,allowedRooms:config.matrix.allowedRooms,allowedUsers:config.matrix.allowedUsers,strictRoomMembership:config.matrix.strictRoomMembership});await client.start(async()=>{});const identity=await client.identity();for(const room of config.matrix.allowedRooms){if(!(await client.isRoomEncrypted(room)))throw new Error(`unencrypted room ${room}`);const members=await client.members(room);if(members.some(m=>m!==config.matrix.userId&&!config.matrix.allowedUsers.includes(m)))throw new Error(`unauthorized room member in ${room}`);if(config.matrix.requireVerifiedDevices){const trust=await client.trustReport(room);if(trust.trusted!==trust.total)throw new Error(`room contains ${trust.total-trust.trusted} device(s) that are not owner-signed`);}}return`device identity stable; all configured rooms passed`;});await client?.stop();}
+ }
+}
+for(const item of checks)console.log(`${item.ok?"PASS":"FAIL"}  ${item.name}: ${item.detail}`);if(checks.some(c=>!c.ok))process.exitCode=1;
+function permissions(path:string,forbidden:number){const stat=lstatSync(path);if(stat.isSymbolicLink())throw new Error("symlink refused");if((stat.mode&forbidden)!==0)throw new Error(`unsafe mode ${(stat.mode&0o777).toString(8)}`);if(typeof process.getuid==="function"&&stat.uid!==process.getuid())throw new Error("wrong owner");return`mode ${(stat.mode&0o777).toString(8)}`;}

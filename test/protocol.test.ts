@@ -1,0 +1,3 @@
+import test from "node:test";import assert from "node:assert/strict";import {readFileSync} from "node:fs";import {protocolNodeFromManifest,type PiProtocolManifest} from "@kybernetria/pi-protocol";
+const manifest=JSON.parse(readFileSync(new URL("../pi.protocol.json",import.meta.url),"utf8")) as PiProtocolManifest;
+test("protocol manifest is valid and exposes no destination or credential fields",()=>{const node=protocolNodeFromManifest(manifest);assert.equal(node.nodeId,"pi_ng");assert.deepEqual(node.provides.map(p=>p.name),["notify","send"]);for(const provide of manifest.provides){const properties=provide.inputSchema.properties??{};for(const key of["recipient","destination","roomId","accessToken","account"])assert.equal(Object.hasOwn(properties,key),false);}});
