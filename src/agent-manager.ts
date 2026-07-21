@@ -3,8 +3,8 @@ import { AgentProfiles } from "./agent-profiles.ts";
 import { ManagedSessionRouter } from "./managed-session-router.ts";
 import type { Conversation } from "./state-store.ts";
 export class AgentManager{
- private readonly managed=new ManagedSessionRouter();private readonly attachedResults=new Map<string,{resolve:(v:string)=>void;reject:(e:Error)=>void}>();
- constructor(private readonly profiles:AgentProfiles,private readonly broker:BrokerServer){broker.onResult((operation,result)=>{const pending=this.attachedResults.get(result.requestId);if(!pending)return;if(operation==="prompt.completed"){this.attachedResults.delete(result.requestId);pending.resolve(result.message??"Pi completed without a text response.");}else if(operation==="prompt.failed"){this.attachedResults.delete(result.requestId);pending.reject(new Error(result.errorCode??"attached_session_failed"));}});}
+ private readonly managed:ManagedSessionRouter;private readonly attachedResults=new Map<string,{resolve:(v:string)=>void;reject:(e:Error)=>void}>();
+ constructor(private readonly profiles:AgentProfiles,private readonly broker:BrokerServer,managedAuthPath?:string){this.managed=new ManagedSessionRouter(managedAuthPath);broker.onResult((operation,result)=>{const pending=this.attachedResults.get(result.requestId);if(!pending)return;if(operation==="prompt.completed"){this.attachedResults.delete(result.requestId);pending.resolve(result.message??"Pi completed without a text response.");}else if(operation==="prompt.failed"){this.attachedResults.delete(result.requestId);pending.reject(new Error(result.errorCode??"attached_session_failed"));}});}
  async submit(conversation:Conversation,requestId:string,message:string,source:{transport:"matrix"|"signal";eventId:string}):Promise<{response:string;sessionId:string;toolExecutions?:string[]}>{
   const profile=this.profiles.get(conversation.agentId);
   if(profile.mode==="managed")return this.managed.prompt(conversation.conversationId,profile,message);

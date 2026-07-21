@@ -3,6 +3,7 @@ import type { AgentProfile } from "./config.ts";
 interface Entry{session:AgentSession;profile:AgentProfile;lastUsed:number;timer?:ReturnType<typeof setTimeout>;}
 export class ManagedSessionRouter{
  private readonly sessions=new Map<string,Entry>();private readonly activeByProfile=new Map<string,number>();private modelRuntime?:ModelRuntime;
+ constructor(private readonly authPath?:string){}
  async prompt(conversationId:string,profile:AgentProfile,message:string):Promise<{sessionId:string,response:string;toolExecutions:string[]}>{
   let entry=this.sessions.get(conversationId);if(!entry){entry=await this.create(profile);this.sessions.set(conversationId,entry);}
   if(entry.timer)clearTimeout(entry.timer);entry.lastUsed=Date.now();await this.acquire(profile);try{const result=await collect(entry.session,message);this.expireLater(conversationId,entry);return{sessionId:entry.session.sessionId,...result};}finally{this.release(profile);}
@@ -12,7 +13,7 @@ export class ManagedSessionRouter{
  dispose():void{for(const id of[...this.sessions.keys()])this.close(id);}
  list(){return[...this.sessions.entries()].map(([conversationId,e])=>({conversationId,sessionId:e.session.sessionId,agentId:e.profile.id,streaming:e.session.isStreaming,lastUsed:e.lastUsed}));}
  private async create(profile:AgentProfile):Promise<Entry>{
-  const loader=new DefaultResourceLoader({cwd:profile.cwd,agentDir:getAgentDir(),noExtensions:true});await loader.reload();this.modelRuntime??=await ModelRuntime.create();let model;
+  const loader=new DefaultResourceLoader({cwd:profile.cwd,agentDir:getAgentDir(),noExtensions:true});await loader.reload();this.modelRuntime??=await ModelRuntime.create(this.authPath?{authPath:this.authPath}:undefined);let model;
   if(profile.model){const resolved=resolveCliModel({cliModel:profile.model,modelRuntime:this.modelRuntime});if(resolved.error||!resolved.model)throw new Error(resolved.error??`Unknown model ${profile.model}`);model=resolved.model;}
   const {session}=await createAgentSession({cwd:profile.cwd,resourceLoader:loader,sessionManager:SessionManager.inMemory(profile.cwd),modelRuntime:this.modelRuntime,...(model?{model}:{}),...(profile.tools?{tools:profile.tools}:{})});return{session,profile,lastUsed:Date.now()};
  }
