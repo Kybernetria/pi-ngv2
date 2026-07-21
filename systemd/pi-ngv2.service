@@ -17,6 +17,7 @@ PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=%h/.config/pi-ng %h/.local/share/pi-ngv2 %h/.local/state/pi-ngv2 %t/pi-ngv2
+@AGENT_WRITE_PATHS@
 RestrictSUIDSGID=yes
 LockPersonality=yes
 
