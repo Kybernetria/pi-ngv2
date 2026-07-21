@@ -96,7 +96,7 @@ Keep `matrix.shadowMode: true` initially. The bot syncs, decrypts, authorizes, a
 npm run daemon
 ```
 
-Matrix thread roots create conversations. Thread replies remain FIFO within the conversation, while independent managed sessions can run concurrently. Responses return to the originating thread.
+Matrix conversation routing is configurable. `conversationMode: "room"` (recommended for mobile) keeps one active conversation per room and sends top-level responses; `!pi new` resets it. Explicit Matrix threads still create isolated conversations. `conversationMode: "thread"` makes every top-level message a separate conversation and returns responses to its thread.
 
 ## Commands
 
@@ -107,7 +107,7 @@ Commands are daemon operations and are never forwarded to Pi:
 !pi agents
 !pi sessions
 !pi status
-!pi new <agent-id> [initial prompt]
+!pi new [agent-id] [initial prompt]
 !pi attach <session-id>
 !pi detach
 !pi close

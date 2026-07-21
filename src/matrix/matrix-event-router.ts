@@ -10,7 +10,7 @@ export function parsePiCommand(text:string):PiCommand|undefined{
  const parts=text.trim().split(/\s+/);
  const command=(parts[1]??"help").toLowerCase();
  if(simpleCommands.has(command as SimpleCommand))return{kind:command as SimpleCommand};
- if(command==="new"&&parts[2])return{kind:"new",agentId:parts[2],...(parts.length>3?{prompt:parts.slice(3).join(" ")}:{})};
+ if(command==="new")return{kind:"new",agentId:parts[2]??"",...(parts.length>3?{prompt:parts.slice(3).join(" ")}:{})};
  if(command==="attach"&&parts[2])return{kind:"attach",sessionId:parts[2]};
  if(command==="retry")return{kind:"retry",confirmed:parts.includes("--confirm")};
  return{kind:"help"};

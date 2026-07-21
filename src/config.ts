@@ -19,6 +19,7 @@ const agentSchema = z.object({
 const matrixSchema = z.object({
   enabled: z.boolean().default(false),
   shadowMode: z.boolean().default(true),
+  conversationMode: z.enum(["thread", "room"]).default("thread"),
   homeserver: z.string().url().optional(),
   userId: z.string().startsWith("@").optional(),
   accessTokenFile: z.string().optional(),

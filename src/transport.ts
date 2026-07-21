@@ -12,6 +12,7 @@ export interface ChatEvent {
   senderId: string;
   roomId?: string;
   threadId?: string;
+  threaded?: boolean;
   text: string;
   timestamp: number;
   encrypted: boolean;

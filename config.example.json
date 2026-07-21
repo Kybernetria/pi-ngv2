@@ -4,6 +4,7 @@
   "matrix": {
     "enabled": true,
     "shadowMode": true,
+    "conversationMode": "room",
     "homeserver": "https://matrix.example.org",
     "userId": "@pi-agent:example.org",
     "accessTokenFile": "/home/user/.local/share/pi-ngv2/matrix/access-token",
