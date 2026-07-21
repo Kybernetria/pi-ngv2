@@ -42,6 +42,7 @@
     "daemon": "tsx scripts/daemon.ts",
     "doctor": "tsx scripts/doctor.ts",
     "enroll:matrix": "tsx scripts/enroll-matrix.ts",
+    "verify:matrix-device": "tsx scripts/verify-matrix-device.ts",
     "install:service": "tsx scripts/install-user-service.ts",
     "verify:crypto": "tsx src/native-integrity.ts"
   },
